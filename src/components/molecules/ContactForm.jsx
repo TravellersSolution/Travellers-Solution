@@ -141,7 +141,7 @@ export default function ContactForm() {
   };
 
   return (
-    <section className="flex flex-col items-start justify-center gap-10 p-10 mb-4 md:mt-28 md:mb-36 md:flex-row">
+    <section className="flex flex-col items-start justify-center gap-10 p-10 mb-4 md:mb-36 md:flex-row">
       {/* Left: Contact Form */}
       <div className="w-full p-6 bg-white rounded-lg shadow-md md:w-2/3">
         {successMessage ? (

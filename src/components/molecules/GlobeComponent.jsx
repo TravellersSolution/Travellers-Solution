@@ -15,9 +15,8 @@ const GlobeComponent = ({ cities, continent = "Europe" }) => {
   const visibleCountries = [
     "Andorra", "Austria", "Belgium", "Croatia", "Cyprus", "Czechia", "Czech Republic",
     "Denmark", "Finland", "France", "Germany", "Greece", "Hungary", "Iceland", 
-    "Ireland", "Italy", "Liechtenstein", "Luxembourg", "Malta", "Monaco", 
-    "Montenegro", "Netherlands", "Norway", "Portugal", "Slovakia", "Slovenia", 
-    "Spain", "Sweden", "Switzerland", "United Kingdom", "Vatican City"
+    "Ireland", "Italy", "Malta", "Monaco", "Netherlands", "Norway", "Portugal", "Slovakia", "Slovenia", 
+    "Spain", "Sweden", "Switzerland", "United Kingdom"
   ];
 
   const processEuropeanTerritories = useCallback((features) => {
@@ -28,6 +27,12 @@ const GlobeComponent = ({ cities, continent = "Europe" }) => {
       feature.properties.NAME_LONG ||
       "";
     
+    // Debug: Log all features to see what countries are available in the GeoJSON
+    console.log("All GeoJSON features:", features.map(f => ({
+      name: getCountryName(f),
+      properties: f.properties
+    })).filter(f => f.name.toLowerCase().includes('andorra') || f.name.toLowerCase().includes('spain') || f.name.toLowerCase().includes('monaco')));
+    
     // First filter for countries we want to display
     let filteredFeatures = features.filter((feature) => {
       const countryName = getCountryName(feature);
@@ -35,6 +40,9 @@ const GlobeComponent = ({ cities, continent = "Europe" }) => {
       return visibleCountries.includes(countryName) || 
              (countryName === "Czech Republic" && visibleCountries.includes("Czechia"));
     });
+    
+    // Debug: Log filtered features
+    console.log("Filtered features:", filteredFeatures.map(f => getCountryName(f)));
     
     // Process each feature - special handling for France
     const processedFeatures = filteredFeatures.map(feature => {
@@ -152,11 +160,11 @@ const GlobeComponent = ({ cities, continent = "Europe" }) => {
     { lat: 64.9631, lng: -19.0208, name: 'Iceland', country: 'Iceland' },
     { lat: 53.4129, lng: -8.2439, name: 'Ireland', country: 'Ireland' },
     { lat: 41.8719, lng: 12.5674, name: 'Italy', country: 'Italy' },
-    { lat: 47.1660, lng: 9.5554, name: 'Liechtenstein', country: 'Liechtenstein' },
-    { lat: 49.8153, lng: 6.1296, name: 'Luxembourg', country: 'Luxembourg' },
+    // { lat: 47.1660, lng: 9.5554, name: 'Liechtenstein', country: 'Liechtenstein' },
+    // { lat: 49.8153, lng: 6.1296, name: 'Luxembourg', country: 'Luxembourg' },
     { lat: 35.9375, lng: 14.3754, name: 'Malta', country: 'Malta' },
     { lat: 43.7384, lng: 7.4246, name: 'Monaco', country: 'Monaco' },
-    { lat: 42.7087, lng: 19.3744, name: 'Montenegro', country: 'Montenegro' },
+    // { lat: 42.7087, lng: 19.3744, name: 'Montenegro', country: 'Montenegro' },
     { lat: 52.1326, lng: 5.2913, name: 'Netherlands', country: 'Netherlands' },
     { lat: 60.4720, lng: 8.4689, name: 'Norway', country: 'Norway' },
     { lat: 39.3999, lng: -8.2245, name: 'Portugal', country: 'Portugal' },
@@ -166,7 +174,7 @@ const GlobeComponent = ({ cities, continent = "Europe" }) => {
     { lat: 60.1282, lng: 18.6435, name: 'Sweden', country: 'Sweden' },
     { lat: 46.8182, lng: 8.2275, name: 'Switzerland', country: 'Switzerland' },
     { lat: 55.3781, lng: -3.4360, name: 'United Kingdom', country: 'United Kingdom' },
-    { lat: 41.9029, lng: 12.4534, name: 'Vatican City', country: 'Vatican City' }
+    // { lat: 41.9029, lng: 12.4534, name: 'Vatican City', country: 'Vatican City' }
   ];
 
   // Debounce function to prevent too many operations during resize
@@ -274,6 +282,12 @@ const GlobeComponent = ({ cities, continent = "Europe" }) => {
         .polygonCapColor((d) => countryColors[d.properties.name] || countryColors.Germany)
         .polygonAltitude(() => 0.06); // Set all countries to the same altitude
       
+      // Debug: log all polygon data to see what countries are available
+      console.log("All polygons data:", polygonsData.map(p => ({ 
+        name: p.properties.name, 
+        id: p.properties.id 
+      })));
+      
       // Use HTML elements for country labels at centroids instead of capitals
       globe
         .htmlElementsData(countryCentroids)
@@ -286,10 +300,50 @@ const GlobeComponent = ({ cities, continent = "Europe" }) => {
           el.style.fontSize = '14px';
           el.style.textAlign = 'center';
           el.style.textShadow = '0 0 5px rgba(0, 0, 0, 0.8), 0 0 3px rgba(0, 0, 0, 0.8)';
-          el.style.pointerEvents = 'none'; // Don't interfere with mouse events
+          el.style.pointerEvents = 'auto'; // Allow pointer events for click
           el.style.userSelect = 'none'; // Prevent text selection
           el.style.transform = 'translate(-50%, -50%)'; // Center the element
           el.style.whiteSpace = 'nowrap'; // Keep text on one line
+          el.style.cursor = 'pointer'; // Show pointer cursor on hover
+
+          // Add click handler to label
+          el.onclick = (e) => {
+            e.stopPropagation();
+            // Simulate polygon click logic for this country
+            const country = d.country.toLowerCase().trim();
+            const normalizedCountry = country.replace(/\s+/g, '').toLowerCase();
+
+            // Debug: log all available city country names for troubleshooting
+            if (cities && Array.isArray(cities)) {
+              console.log("Available cities countries:", cities.map(c => c.country));
+              const allCountries = cities.map(c => c.country && c.country.replace(/\s+/g, '').toLowerCase());
+              if (!allCountries.includes(normalizedCountry)) {
+                console.warn(
+                  `Country "${country}" detected, but not found in cities data. ` +
+                  `Add "${country.charAt(0).toUpperCase() + country.slice(1)}" to your cities array for correct linking.`
+                );
+              }
+            }
+
+            const targetCity = cities?.find(
+              (city) =>
+                city.country &&
+                city.country.replace(/\s+/g, '').toLowerCase() === normalizedCountry
+            );
+
+            console.log("Label click - Final country for search:", country);
+            console.log("Label click - Found target city:", targetCity);
+
+            if (targetCity && targetCity.url) {
+              window.open(targetCity.url, "_blank");
+            } else {
+              console.warn(`No city found for country: ${country}`);
+              if (country) {
+                window.open(`/destination?country=${encodeURIComponent(normalizedCountry)}`, "_blank");
+              }
+            }
+          };
+
           return el;
         })
         .htmlAltitude(0.1) // Keep slightly above the polygons
@@ -309,20 +363,147 @@ const GlobeComponent = ({ cities, continent = "Europe" }) => {
   // Handle click events on countries
   useEffect(() => {
     if (!globeInstanceRef.current) return;
-    
-    // Set up click handler for countries
+
     globeInstanceRef.current.onPolygonClick((polygon) => {
       if (polygon && polygon.properties) {
-        const country = polygon.properties.name;
-        const targetCity = cities?.find((city) => city.country === country);
+        let country = polygon.properties.name?.toLowerCase().trim();
+
+        // Debug log to see what country is detected
+        console.log("Clicked polygon:", polygon);
+        console.log("Country detected:", country);
+        console.log("Checking coordinate override - country:", country, "has geometry:", !!polygon.geometry);
+
+        // If country is Spain but coordinates suggest Andorra, override
+        // Also handle case where no country name is detected
+        if (!country || country === '' || 
+            (country === 'spain' && polygon.geometry)) {
+          console.log("Entering coordinate-based detection");
+          // Calculate the centroid of the polygon for better identification
+          let centroid = null;
+          if (polygon.geometry && polygon.geometry.coordinates) {
+            const coords = polygon.geometry.coordinates;
+            // Robust centroid calculation for both Polygon and MultiPolygon
+            let allCoords = [];
+            if (polygon.geometry.type === 'Polygon') {
+              coords.forEach(ring => {
+                ring.forEach(coord => allCoords.push(coord));
+              });
+            } else if (polygon.geometry.type === 'MultiPolygon') {
+              coords.forEach(poly => {
+                poly.forEach(ring => {
+                  ring.forEach(coord => allCoords.push(coord));
+                });
+              });
+            }
+            if (allCoords.length > 0) {
+              const avg = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
+              centroid = {
+                lat: avg(allCoords.map(c => c[1])),
+                lng: avg(allCoords.map(c => c[0]))
+              };
+            }
+          }
+
+          // Try to match centroid to known country locations
+          console.log("Calculated centroid:", centroid);
+          
+          if (centroid) {
+            const countryCentroidMap = {
+              'andorra': { lat: 42.5063, lng: 1.5218 },
+              'monaco': { lat: 43.7384, lng: 7.4246 },
+              'malta': { lat: 35.9375, lng: 14.3754 },
+              'cyprus': { lat: 35.1264, lng: 33.4299 }
+            };
+
+            // Find the closest match (within reasonable distance)
+            let bestMatch = null;
+            let bestDistance = Infinity;
+            
+            for (const [countryName, expectedCentroid] of Object.entries(countryCentroidMap)) {
+              const distance = Math.sqrt(
+                Math.pow(centroid.lat - expectedCentroid.lat, 2) + 
+                Math.pow(centroid.lng - expectedCentroid.lng, 2)
+              );
+              
+              console.log(`Distance to ${countryName}:`, distance, `(expected: lat=${expectedCentroid.lat}, lng=${expectedCentroid.lng})`);
+              
+              if (distance < bestDistance) {
+                bestDistance = distance;
+                bestMatch = countryName;
+              }
+            }
+            
+            // Use stricter distance for small countries
+            let maxDistance = 1.5;
+            if (bestMatch === 'andorra') maxDistance = 0.2;
+            if (bestMatch === 'cyprus') maxDistance = 0.5; // Cyprus is small and isolated
+
+            console.log(`Best match: ${bestMatch}, distance: ${bestDistance}, maxDistance: ${maxDistance}`);
+            if (bestMatch && bestDistance < maxDistance) {
+                country = bestMatch;
+                console.log(`Matched by coordinates: ${bestMatch} (distance: ${bestDistance})`);
+                console.log(`Clicked coordinates: lat=${centroid.lat}, lng=${centroid.lng}`);
+            } else {
+                // Special fallback for Cyprus: if centroid is very close, force match
+                const cyprusCentroid = countryCentroidMap['cyprus'];
+                const cyprusDistance = Math.sqrt(
+                  Math.pow(centroid.lat - cyprusCentroid.lat, 2) +
+                  Math.pow(centroid.lng - cyprusCentroid.lng, 2)
+                );
+                if (cyprusDistance < 0.5) {
+                  country = 'cyprus';
+                  console.log('Forced Cyprus match by centroid fallback');
+                } else {
+                  console.log(`No coordinate match found - keeping original country: ${country}`);
+                }
+            }
+          }
+        }
+
+        // Ensure we have a valid country before proceeding
+        if (!country || country === '') {
+          console.warn("Could not determine country from clicked polygon");
+          return;
+        }
+
+        // Normalize country name for matching
+        const normalizedCountry = country.replace(/\s+/g, '').toLowerCase();
+
+        // Debug: log all available city country names for troubleshooting
+        if (cities && Array.isArray(cities)) {
+          console.log("Available cities countries:", cities.map(c => c.country));
+          // Warn if the detected country is not in the cities list
+          const allCountries = cities.map(c => c.country && c.country.replace(/\s+/g, '').toLowerCase());
+          if (!allCountries.includes(normalizedCountry)) {
+            console.warn(
+              `Country "${country}" detected, but not found in cities data. ` +
+              `Add "${country.charAt(0).toUpperCase() + country.slice(1)}" to your cities array for correct linking.`
+            );
+          }
+        }
+
+        const targetCity = cities?.find(
+          (city) =>
+            city.country &&
+            city.country.replace(/\s+/g, '').toLowerCase() === normalizedCountry
+        );
+        
+        console.log("Final country for search:", country);
+        console.log("Found target city:", targetCity);
+        
         if (targetCity && targetCity.url) {
           window.open(targetCity.url, "_blank");
+        } else {
+          console.warn(`No city found for country: ${country}`);
+          // Fallback: open /destination?country={country}
+          if (country) {
+            window.open(`/destination?country=${encodeURIComponent(normalizedCountry)}`, "_blank");
+          }
         }
       }
     });
-      
+
     return () => {
-      // Clean up event handlers but don't destroy globe instance
       if (globeInstanceRef.current) {
         globeInstanceRef.current.onPolygonClick(null);
       }

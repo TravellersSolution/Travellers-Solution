@@ -4,39 +4,46 @@ export const tourismData = [
     country: "Andorra",
     description: "Andorra is a picturesque microstate nestled in the Pyrenees, known for its ski resorts, mountain trails, and duty-free shopping. With its charming capital, Andorra la Vella, it is a perfect year-round escape for nature and adventure lovers.",
     basicInfo: {
-      capital: "Reykjavík",
-      currency: "Icelandic Króna (ISK)",
+      capital: "Andorra la Vella",
+      currency: "Euro (€)",
       voltage: "230V, 50Hz",
       plugTypes: ["C", "F"],
-      timeZone: "Greenwich Mean Time (GMT, UTC +0) – no daylight saving time",
-      officialLanguage: "Icelandic",
-      otherLanguages: []
+      timeZone: "Central European Time (CET, UTC +1)",
+      officialLanguage: "Catalan",
+      otherLanguages: ["Spanish", "French", "Portuguese"]
     },
     popularAttractions: [
-      { name: "Golden Circle Route", description: "Includes Þingvellir National Park, Gullfoss Waterfall, and Geysir" },
-      { name: "Blue Lagoon", description: "Iconic geothermal spa located near Reykjavík" },
-      { name: "Northern Lights (Aurora Borealis)", description: "Best viewed from October to March" },
-      { name: "Jökulsárlón Glacier Lagoon", description: "Icebergs floating on a stunning glacial lake" },
-      { name: "Vatnajökull National Park", description: "Home to Europe's largest glacier" },
-      { name: "Ring Road (Route 1)", description: "A scenic drive that circles the entire island" },
-      { name: "Skógafoss & Seljalandsfoss", description: "Two of the most breathtaking waterfalls in Iceland" },
-      { name: "Reykjavík", description: "The quirky, colorful capital known for culture, music, and nightlife" },
-      { name: "Black Sand Beach (Reynisfjara)", description: "Notable for striking basalt formations and a dramatic coastline" },
-      { name: "Ice Cave Tours & Glacier Hiking", description: "Unique adventures exploring Iceland's frozen landscapes" }
+      { name: "Vallnord Ski Resort", description: "Popular for skiing, snowboarding, and winter sports." },
+      { name: "Grandvalira", description: "The largest ski resort in the Pyrenees." },
+      { name: "Caldea Spa Complex", description: "Europe's largest mountain spa with thermal waters." },
+      { name: "Madriu-Perafita-Claror Valley", description: "A UNESCO World Heritage Site known for hiking trails." },
+      { name: "Casa de la Vall", description: "Historic parliament building in Andorra la Vella." }
     ],
     faq: {
-      famousFor: ["Volcanoes", "Glaciers", "Geothermal spas", "Northern Lights", "Waterfalls", "Unspoiled landscapes"],
-      entryRequirements: "Schengen visa required for non-EU citizens",
-      tipping: "Not expected; service is usually included in prices",
+      famousFor: ["Ski resorts", "Mountain trails", "Duty-free shopping", "Thermal spas"],
+      entryRequirements: "Schengen visa required for non-EU visitors.",
+      tipping: "Not mandatory, but rounding up bills is appreciated.",
       weather: {
-        winter: { months: "Nov–Mar", description: "Cold, snowy, and dark — best for viewing the Northern Lights", temperature: "avg -3°C to 3°C" },
-        summer: { months: "Jun–Aug", description: "Cool and bright, with the Midnight Sun phenomenon", temperature: "avg 10°C to 15°C" }
+        winter: {
+          months: "Dec–Feb",
+          description: "Snowy and cold, peak season for skiing.",
+          temperature: "avg -2°C to 5°C"
+        },
+        summer: {
+          months: "Jun–Aug",
+          description: "Mild, great for hiking and exploring mountains.",
+          temperature: "avg 15°C to 25°C"
+        }
       },
       bestTimeToVisit: {
-        winter: "Perfect for seeing the Northern Lights and exploring ice caves",
-        springSummer: "Summer: Ideal for road trips and hiking"
+        winter: "Perfect for skiing and winter sports.",
+        springSummer: "Great for hiking, biking, and shopping."
       }
-    }
+    },
+    packages: [
+      { title: "Ski Adventure Package", description: "5-day ski trip with accommodations in Vallnord.", price: "$799" },
+      { title: "Relax & Spa Package", description: "3 nights stay including Caldea spa passes.", price: "$499" }
+    ]
   },
   {
     country: "Austria",

@@ -1,12 +1,32 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import Tourist1 from "../../assets/images/Tourist1.png";
 import { tourismData } from './tourismData'; // Import your data
+
+// Import all images from the destination images directory using Vite's import.meta.glob
+const imageModules = import.meta.glob('../../assets/images/destinationimages/**/*.{png,jpg,jpeg,svg,avif}', { eager: true });
+
+// Process the imported images to create a lookup object
+const images = {};
+Object.entries(imageModules).forEach(([path, module]) => {
+  const relativePath = path.replace('../../assets/images/', '');
+  images[relativePath] = module.default;
+});
 
 const CountryOverview = ({ country }) => {
   // Find the country data
   const countryData = tourismData.find(data => 
     data.country.toLowerCase() === country?.toLowerCase()
   );
+
+  // Find the tourism at glance image for the country (handles different extensions)
+  const tourismImage = useMemo(() => {
+    if (!country) return null;
+    const tourismImageKey = Object.keys(images).find(key => 
+      key.includes(`destinationimages/${country}/tourismatgalnce.`) || 
+      key.includes(`destinationimages/${country.toLowerCase()}/tourismatgalnce.`)
+    );
+    return tourismImageKey ? images[tourismImageKey] : null;
+  }, [country]);
 
   // Fallback if country not found
   if (!countryData) {
@@ -54,9 +74,10 @@ const CountryOverview = ({ country }) => {
       {/* Image section */}
       <div className="h-[250px] md:w-1/3 md:h-full">
         <img
-          src={Tourist1}
+          src={tourismImage}
           alt={`${country} Landscape`}
           className="object-cover w-full h-full md:rounded-r-3xl"
+          style={{ height: "380px" }}
         />
       </div>
     </div>

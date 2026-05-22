@@ -1,6 +1,16 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import Tourist2 from "../../assets/images/Tourist2.png";
 import { tourismData } from './tourismData';
+
+// Import all images from the destination images directory using Vite's import.meta.glob
+const imageModules = import.meta.glob('../../assets/images/destinationimages/**/*.{png,jpg,jpeg,svg,avif}', { eager: true });
+
+// Process the imported images to create a lookup object
+const images = {};
+Object.entries(imageModules).forEach(([path, module]) => {
+  const relativePath = path.replace('../../assets/images/', '');
+  images[relativePath] = module.default;
+});
 
 const  CountryFAQ = ({ country }) => {
   // Find the country data
@@ -8,11 +18,21 @@ const  CountryFAQ = ({ country }) => {
     data.country.toLowerCase() === country?.toLowerCase()
   );
 
+  // Find the FAQ image for the country (handles different extensions)
+  const faqImage = useMemo(() => {
+    if (!country) return null;
+    const faqImageKey = Object.keys(images).find(key => 
+      key.includes(`destinationimages/${country}/faq.`) || 
+      key.includes(`destinationimages/${country.toLowerCase()}/faq.`)
+    );
+    return faqImageKey ? images[faqImageKey] : null;
+  }, [country]);
+
   // Fallback if country not found
   if (!countryData) {
     return (
       <div className="p-6 text-center">
-        <p>FAQ information not available for {country}</p>
+        <p>FAQ information not available for {country.charAt(0).toUpperCase() + country.slice(1)}</p>
       </div>
     );
   }
@@ -23,7 +43,9 @@ const  CountryFAQ = ({ country }) => {
     <div className="flex flex-col h-auto px-2 mt-12 mb-20 overflow-hidden shadow-lg md:mt-20 md:p-10 md:flex-row bg-red-50 md:mx-40 md:rounded-3xl">
       {/* Left content section */}
       <div className="p-6 md:w-2/3">
-        <h2 className="text-2xl font-bold text-red-600">{country} Tourism FAQs</h2>
+        <h2 className="text-2xl font-bold text-red-600">
+          {country.charAt(0).toUpperCase() + country.slice(1)} Tourism FAQs
+        </h2>
         
         <div className="mt-4 space-y-5">
           {/* Famous For */}
@@ -107,9 +129,11 @@ const  CountryFAQ = ({ country }) => {
       {/* Right image section */}
       <div className="h-[250px] md:w-1/3 md:h-full">
         <img
-          src={Tourist2}
+          src={faqImage}
+          //src={Tourist2}
           alt={`${country} Tourism`}
           className="object-cover w-full h-full md:rounded-r-3xl"
+          style={{ height: "564px" }}
         />
       </div>
     </div>

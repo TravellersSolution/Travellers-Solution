@@ -81,7 +81,7 @@ const PopularPlaces = ({ country }) => {
   if (!countryData) {
     return (
       <div className="p-6 text-center">
-        <p>Places information not available for {country}</p>
+        <p>Places information not available for {country.charAt(0).toUpperCase() + country.slice(1)}</p>
       </div>
     );
   }
@@ -89,7 +89,9 @@ const PopularPlaces = ({ country }) => {
   return (
     <div className="px-5 py-10 md:px-36">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold">Popular Places in {country}</h2>
+        <h2 className="text-2xl font-bold">
+          Popular Places in {country.charAt(0).toUpperCase() + country.slice(1)}
+        </h2>
         <button className="px-4 py-2 text-red-500 border border-red-500 rounded-lg hover:bg-red-500 hover:text-white">
           SEE ALL
         </button>
